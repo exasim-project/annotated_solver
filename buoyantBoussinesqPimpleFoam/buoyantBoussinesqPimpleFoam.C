@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
+        START(TimeStep);
         #include "readDyMControls.H"
         #include "CourantNo.H"
         #include "setDeltaT.H"
@@ -106,6 +107,7 @@ int main(int argc, char *argv[])
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
+            START(PIMPLEStep);
             if (pimple.firstIter() || moveMeshOuterCorrectors)
             {
                 // Do any mesh changes
@@ -148,8 +150,10 @@ int main(int argc, char *argv[])
                 laminarTransport.correct();
                 turbulence->correct();
             }
+            STOP(PIMPLEStep);
         }
 
+        STOP(TimeStep);
         runTime.write();
 
         runTime.printExecutionTime(Info);
